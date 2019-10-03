@@ -110,7 +110,7 @@ void fraxreserve::buyfrax(name buyer, asset frax) {
     // Issue FRAX
     action(
         permission_level { _self, name("active") },
-        name("fraxtokenfxs"), name("issue"),
+        FRAX_TOKENS, name("issue"),
         std::make_tuple( buyer, frax, std::string("issue FRAX") )
     ).send();
 

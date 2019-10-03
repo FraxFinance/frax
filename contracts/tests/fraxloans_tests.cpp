@@ -153,7 +153,8 @@ BOOST_FIXTURE_TEST_CASE(fraxloans_full, fraxloans_tester) try {
 	BOOST_REQUIRE_EQUAL(bob_eos["borrowing"], "300.0000 EOS");
 
     // accrue interest
-    produce_block( fc::hours(3*24) );
+    SUCCESS(fraxloans.advancetime("4,USDT", 10*86400));
+    SUCCESS(fraxloans.advancetime("4,EOS", 10*86400));
 
     // repay
     SUCCESS(fraxloans.repay(N(alice), asset::from_string("500.0000 USDT")));
@@ -163,8 +164,7 @@ BOOST_FIXTURE_TEST_CASE(fraxloans_full, fraxloans_tester) try {
     tether_stats = fraxloans.get_tokenstats("4,USDT");
     alice_usdt = fraxloans.get_account(N(alice), "4,USDT");
     bob_eos = fraxloans.get_account(N(bob), "4,EOS");
-	BOOST_REQUIRE_EQUAL(tether_stats["interest_counter"], 1e9);
-	BOOST_REQUIRE_EQUAL(tether_stats["last_interest_update"], 15000000);
+	BOOST_REQUIRE_EQUAL(tether_stats["interest_counter"], 100054794520);
 	BOOST_REQUIRE_EQUAL(alice_usdt["balance"], "500.0000 USDT");
 	BOOST_REQUIRE_EQUAL(alice_usdt["borrowing"], "501.0000 USDT");
 	BOOST_REQUIRE_EQUAL(bob_eos["balance"], "100.0000 EOS");
@@ -172,6 +172,10 @@ BOOST_FIXTURE_TEST_CASE(fraxloans_full, fraxloans_tester) try {
 
     // repay too much
     ERROR("Attempting to repay too much", fraxloans.repay(N(alice), asset::from_string("1000.0000 USDT")));
+    
+    // accrue interest must work on the smallest time scale available
+    SUCCESS(fraxloans.advancetime("4,USDT", 1));
+    SUCCESS(fraxloans.advancetime("4,EOS", 1));
     
 }
 FC_LOG_AND_RETHROW()

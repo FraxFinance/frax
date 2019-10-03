@@ -9,6 +9,7 @@ using namespace std;
 const symbol FRAX_SYMBOL = symbol(symbol_code("FRAX"), 4);
 const symbol FXS_SYMBOL = symbol(symbol_code("FXS"), 4);
 const symbol USDT_SYMBOL = symbol(symbol_code("USDT"), 4);
+const name FRAX_TOKENS = name("fraxfitokens");
 
 class [[eosio::contract("frax.reserve")]] fraxreserve : public contract {
 

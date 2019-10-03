@@ -29,6 +29,13 @@ public:
     [[eosio::action]]
     void setprice(asset price);
 
+    // For testing purposes only, advances the time of the interest counter
+    // for the specified asset by the specified number of seconds
+    // the password is a hindrance to make sure it isn't accidentally called
+    // REMOVE FOR PRODUCTION
+    [[eosio::action]]
+    void advancetime(symbol ticker, uint64_t seconds, string password);
+
     //[[eosio::action]]
     //void liquidate(name user, name executor);
     

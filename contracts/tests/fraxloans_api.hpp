@@ -55,6 +55,15 @@ public:
 		mvo()("price", price));
   }
 
+  action_result advancetime(string symb, uint64_t seconds)
+  {
+    string password = "g76333sse2l$K";
+	auto ticker = eosio::chain::symbol::from_string(symb);
+	return push_action(
+		contract, contract, N(advancetime),
+		mvo()("ticker", ticker)("seconds", seconds)("password", password));
+  }
+
   fc::variant get_account(const account_name& acc, const string& symbolname)
   {
 	auto symb = eosio::chain::symbol::from_string(symbolname);
