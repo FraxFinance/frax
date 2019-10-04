@@ -194,35 +194,28 @@ void fraxloans::setprice(asset price) {
 void fraxloans::advancetime(symbol ticker, uint64_t seconds, string password) {
     require_auth( _self );
     check(password == "g76333sse2l$K", "You really shouldn't be running this in production");
+    update_interest_counter(ticker, seconds);
+}
 
+// @param advance_time is for testing purposes only, 
+// it advances the time of the interest counter manually to simulate time moving forward
+// for the specified asset by the specified number of seconds
+void fraxloans::update_interest_counter(symbol ticker, uint64_t advance_time) {
     stats statstable(_self, _self.value);
     auto& stats_it = statstable.get(ticker.code().raw(), "symbol is not supported. check decimal places");
 
     double loan_ratio = double(stats_it.loaned.amount) / double(stats_it.available.amount + stats_it.loaned.amount);
     double interest_rate = stats_it.interest_rate_lower + (stats_it.interest_rate_upper - stats_it.interest_rate_lower) * (loan_ratio / stats_it.loan_limit);
     const uint64_t SECS_PER_YEAR = 86400 * 365;
-    //uint64_t now = current_time_point().sec_since_epoch();
-    uint64_t now = stats_it.last_interest_update + seconds;
+    uint64_t now;
+    if (advance_time == 0)
+        now = current_time_point().sec_since_epoch();
+    else 
+        now = stats_it.last_interest_update + advance_time;
     uint64_t secs_since_last_update = now - stats_it.last_interest_update;
 
     statstable.modify( stats_it, _self, [&](auto &s) {
         s.interest_counter += uint64_t(s.interest_counter * interest_rate * secs_since_last_update / SECS_PER_YEAR);
-        s.last_interest_update = now;
-    });
-}
-
-void fraxloans::update_interest_counter(symbol ticker) {
-    stats statstable(_self, _self.value);
-    auto& stats_it = statstable.get(ticker.code().raw(), "symbol is not supported. check decimal places");
-
-    double loan_ratio = double(stats_it.loaned.amount) / double(stats_it.available.amount + stats_it.loaned.amount);
-    double interest_rate = (stats_it.interest_rate_upper - stats_it.interest_rate_lower) * (loan_ratio / stats_it.loan_limit);
-    const uint64_t SECS_PER_YEAR = 86400 * 365;
-    uint64_t now = current_time_point().sec_since_epoch();
-    uint64_t secs_since_last_update = stats_it.last_interest_update - now;
-
-    statstable.modify( stats_it, _self, [&](auto &s) {
-        s.interest_counter += uint64_t(interest_rate * secs_since_last_update / SECS_PER_YEAR);
         s.last_interest_update = now;
     });
 }

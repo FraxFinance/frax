@@ -97,6 +97,6 @@ public:
         return merged;
     }
 
-    void update_interest_counter(symbol ticker);
+    void update_interest_counter(symbol ticker, uint64_t advance_time = 0);
 
 };
