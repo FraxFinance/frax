@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Frax Finance</title>
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+    <link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" href="img/db_logo_32x32.png" />
+</head>
+
+<body id="body">
+    <div id="container">
+        <section class="jumbotron">
+            <h1>Frax Finance</h1>
+            <div>The stablecoin to rule them all</div>
+        </section>
+
+        <section id="login">
+            <div id="no-scatter-alert" class="alert alert-danger">Scatter is not loaded. Please open + unlock Scatter, then reload the page.</div>
+            <div id="checking-scatter-alert" class="alert alert-info">Checking for Scatter compatible wallets <img src="http://www.bba-reman.com/images/fbloader.gif"></div>
+            <button id="login-scatter" class="btn btn-primary">Login with Scatter</button>
+        </section>
+
+        <section id="deposit-tokens">
+            <table class="table">
+                <thead><tr>
+                    <th>Token</th>
+                    <th>Balance</th>
+                    <th>Deposited</th>
+                    <th>Deposit</th>
+                </tr></thead>
+                <tr>
+                    <td>USDT</td>
+                    <td>0.0000</td>
+                    <td>0.0000</td>
+                    <td><input id="usdt-amount"><button>Deposit</button></td>
+                </tr>
+                <tr>
+                    <td>FXS</td>
+                    <td>0.0000</td>
+                    <td>0.0000</td>
+                    <td><input id="fxs-amount"><button>Deposit</button></td>
+                </tr>
+                <tr>
+                    <td>FRAX</td>
+                    <td>0.0000</td>
+                    <td>0.0000</td>
+                    <td><input id="frax-amount"><button>Buy</button></td>
+                </tr>
+            </table>
+        </section>
+    </div>
+
+    <footer></footer>
+</body>
+
+<script src="dist/main.js"></script>
+
+</html>

@@ -1,0 +1,6 @@
+#login, #deposit-tokens {
+    padding-left: 5%;
+}
+#no-scatter-alert, #login-scatter {
+    display: none;
+}
