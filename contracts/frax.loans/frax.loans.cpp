@@ -154,8 +154,7 @@ void fraxloans::repay(name borrower, asset quantity) {
 
     // update interest
     update_interest_counter(quantity.symbol);
-    uint64_t interest_owed = account_it.borrowing.amount * (stat_it.interest_counter - account_it.interest_counter_start) / stat_it.interest_counter;
-    uint64_t total_owed = account_it.borrowing.amount + interest_owed;
+    uint64_t total_owed = account_it.borrowing.amount * stat_it.interest_counter / account_it.interest_counter_start;
     check(quantity.amount <= total_owed, "Attempting to repay too much");
         
     // Update supply
@@ -166,9 +165,8 @@ void fraxloans::repay(name borrower, asset quantity) {
 
     // update borrower account with interest and repayment
     acctstbl.modify( account_it, _self, [&](auto& a) {
-        a.balance.amount += interest_owed;
+        a.borrowing.amount = total_owed - quantity.amount;
         a.balance -= quantity;
-        a.borrowing -= quantity;
         a.interest_counter_start = stat_it.interest_counter;
     });
 }
@@ -216,6 +214,7 @@ void fraxloans::update_interest_counter(symbol ticker, uint64_t advance_time) {
 
     statstable.modify( stats_it, _self, [&](auto &s) {
         s.interest_counter += uint64_t(s.interest_counter * interest_rate * secs_since_last_update / SECS_PER_YEAR);
+        if (advance_time == 1) s.interest_counter += s.loaned.amount;
         s.last_interest_update = now;
     });
 }
