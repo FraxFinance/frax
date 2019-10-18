@@ -1,6 +1,9 @@
 #login, #deposit-tokens {
     padding-left: 5%;
 }
-#no-scatter-alert, #login-scatter {
+#no-scatter-alert, #welcome-user-alert, #tx-error-alert, #login-scatter {
     display: none;
+}
+#login-scatter {
+    margin-bottom: 10px;
 }

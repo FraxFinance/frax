@@ -18,11 +18,13 @@
 
         <section id="login">
             <div id="no-scatter-alert" class="alert alert-danger">Scatter is not loaded. Please open + unlock Scatter, then reload the page.</div>
+            <div id="welcome-user-alert" class="alert alert-success">Welcome ________!</div>
             <div id="checking-scatter-alert" class="alert alert-info">Checking for Scatter compatible wallets <img src="http://www.bba-reman.com/images/fbloader.gif"></div>
-            <button id="login-scatter" class="btn btn-primary">Login with Scatter</button>
+            <div><button id="login-scatter" class="btn btn-primary">Login with Scatter</button></div>
         </section>
 
         <section id="deposit-tokens">
+            <div id="tx-error-alert" class="alert alert-danger">Error sending transaction.</div>
             <table class="table">
                 <thead><tr>
                     <th>Token</th>
@@ -32,21 +34,21 @@
                 </tr></thead>
                 <tr>
                     <td>USDT</td>
-                    <td>0.0000</td>
-                    <td>0.0000</td>
-                    <td><input id="usdt-amount"><button>Deposit</button></td>
+                    <td id="usdt-balance">0.0000</td>
+                    <td id="usdt-contract">0.0000</td>
+                    <td><input id="usdt-amount" type="number" step="0.0001"><button id="deposit-usdt">Deposit</button></td>
                 </tr>
                 <tr>
                     <td>FXS</td>
-                    <td>0.0000</td>
-                    <td>0.0000</td>
-                    <td><input id="fxs-amount"><button>Deposit</button></td>
+                    <td id="fxs-balance">0.0000</td>
+                    <td id="fxs-contract">0.0000</td>
+                    <td><input id="fxs-amount" type="number" step="0.0001"><button id="deposit-fxs">Deposit</button></td>
                 </tr>
                 <tr>
                     <td>FRAX</td>
-                    <td>0.0000</td>
-                    <td>0.0000</td>
-                    <td><input id="frax-amount"><button>Buy</button></td>
+                    <td id="frax-balance">0.0000</td>
+                    <td id="frax-contract">0.0000</td>
+                    <td><input id="frax-amount" type="number"><button id="mint-frax">Mint</button></td>
                 </tr>
             </table>
         </section>
