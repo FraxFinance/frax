@@ -94,6 +94,7 @@ scatter.connect('Frax').then(connected => {
         // Scatter is open and user has previously logged in
         document.getElementById('welcome-user-alert').textContent = `Welcome ${scatter.identity.accounts[0].name}!`;
         document.getElementById('welcome-user-alert').style.display = 'block';
+        updateBalances();
     }
     else {
         // Scatter is open and user has not previously logged in
@@ -102,13 +103,13 @@ scatter.connect('Frax').then(connected => {
             scatter.getIdentity({ accounts: [network] }).then(id => {
                 if(!id) return console.error('no identity');
                 document.getElementById('login-scatter').style.display = 'none';
-                document.getElementById('welcome-user-alert').textContent = `Welcome ${id.accounts[0]}!`;
+                document.getElementById('welcome-user-alert').textContent = `Welcome ${id.accounts[0].name}!`;
                 document.getElementById('welcome-user-alert').style.display = 'block';
+                updateBalances();
             })
         });
     }
 
-    updateBalances();
     eos = ScatterJS.eos(network, Api, {rpc});
 
 });
