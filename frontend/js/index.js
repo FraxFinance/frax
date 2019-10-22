@@ -19,7 +19,7 @@ const scatter = ScatterJS.scatter;
 
 function updateBalances () {
     // Get Contract Deposit Data
-    fetch("https://mainnet.libertyblock.io:7777/v1/chain/get_table_rows", {
+    const req1 = fetch("https://mainnet.libertyblock.io:7777/v1/chain/get_table_rows", {
         method: "POST",
         body: JSON.stringify({
             code: "fraxreserves",
@@ -42,7 +42,7 @@ function updateBalances () {
     .catch(console.error);
 
     // Get Frax Tokens Balance Data
-    fetch("https://mainnet.libertyblock.io:7777/v1/chain/get_table_rows", {
+    const req2 = fetch("https://mainnet.libertyblock.io:7777/v1/chain/get_table_rows", {
         method: "POST",
         body: JSON.stringify({
             code: "fraxfitokens",
@@ -64,7 +64,7 @@ function updateBalances () {
     .catch(console.error);
     
     // Get Tether Tokens Balance Data
-    fetch("https://mainnet.libertyblock.io:7777/v1/chain/get_table_rows", {
+    const req3 = fetch("https://mainnet.libertyblock.io:7777/v1/chain/get_table_rows", {
         method: "POST",
         body: JSON.stringify({
             code: "tethertether",
@@ -81,6 +81,8 @@ function updateBalances () {
         });
     })
     .catch(console.error);
+
+    return Promise.all([req1, req2, req3])
 }
 
 // Login to Scatter
@@ -118,6 +120,9 @@ scatter.connect('Frax').then(connected => {
 document.getElementById('deposit-usdt').addEventListener('click', function () {
     const quantity = document.getElementById("usdt-amount").valueAsNumber.toFixed(4);
     if (quantity <= 0) return false;
+
+    document.getElementById('tx-error-alert').style.display = 'none';
+    document.getElementById('sending-tx-alert').style.display = 'block';
     eos.transact({
         actions: [{
             account: 'tethertether',
@@ -137,10 +142,17 @@ document.getElementById('deposit-usdt').addEventListener('click', function () {
         blocksBehind: 3,
         expireSeconds: 30,
     }).then(res => {
-       document.getElementById('tx-error-alert').style.display = 'none';
-       updateBalances();
+        document.getElementById('tx-error-alert').style.display = 'none';
+        setTimeout(() =>
+            updateBalances().then(() => {
+                document.getElementById('sending-tx-alert').style.display = 'none';
+                document.getElementById('usdt-amount').value = 0;
+            }),
+            1000
+        );
     }).catch(err => {
-       document.getElementById('tx-error-alert').style.display = 'block'; 
+        document.getElementById('tx-error-alert').style.display = 'block'; 
+        document.getElementById('sending-tx-alert').style.display = 'none';
     });
 });
 
@@ -148,6 +160,8 @@ document.getElementById('deposit-usdt').addEventListener('click', function () {
 document.getElementById('deposit-fxs').addEventListener('click', function () {
     const quantity = document.getElementById("fxs-amount").valueAsNumber.toFixed(4);
     if (quantity <= 0) return false;
+
+    document.getElementById('sending-tx-alert').style.display = 'block';
     eos.transact({
         actions: [{
             account: 'fraxfitokens',
@@ -167,18 +181,26 @@ document.getElementById('deposit-fxs').addEventListener('click', function () {
         blocksBehind: 3,
         expireSeconds: 30,
     }).then(res => {
-       document.getElementById('tx-error-alert').style.display = 'none';
-       updateBalances();
+        document.getElementById('tx-error-alert').style.display = 'none';
+        setTimeout(() =>
+            updateBalances().then(() => {
+                document.getElementById('sending-tx-alert').style.display = 'none';
+                document.getElementById('fxs-amount').value = 0;
+            }),
+            1000
+        );
     }).catch(err => {
-       document.getElementById('tx-error-alert').style.display = 'block'; 
+        document.getElementById('tx-error-alert').style.display = 'block'; 
+        document.getElementById('sending-tx-alert').style.display = 'none';
     });
 });
 
 // Buy FRAX
 document.getElementById('mint-frax').addEventListener('click', function () {
     const quantity = document.getElementById("frax-amount").valueAsNumber.toFixed(4);
-    console.log(quantity);
     if (quantity <= 0) return false;
+
+    document.getElementById('sending-tx-alert').style.display = 'block';
     eos.transact({
         actions: [{
             account: 'fraxreserves',
@@ -197,7 +219,13 @@ document.getElementById('mint-frax').addEventListener('click', function () {
         expireSeconds: 30,
     }).then(res => {
         document.getElementById('tx-error-alert').style.display = 'none';
-        updateBalances();
+        setTimeout(() =>
+            updateBalances().then(() => {
+                document.getElementById('sending-tx-alert').style.display = 'none';
+                document.getElementById('frax-amount').value = 0;
+            }),
+            1000
+        );
     }).catch(err => {
         document.getElementById('tx-error-alert').style.display = 'block'; 
         console.error(err);

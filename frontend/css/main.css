@@ -1,7 +1,7 @@
 #login, #deposit-tokens {
-    padding-left: 5%;
+    padding: 0 5%;
 }
-#no-scatter-alert, #welcome-user-alert, #tx-error-alert, #login-scatter {
+#no-scatter-alert, #welcome-user-alert, #tx-error-alert, #login-scatter, #sending-tx-alert {
     display: none;
 }
 #login-scatter {
