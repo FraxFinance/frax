@@ -23,6 +23,31 @@
             <div><button id="login-scatter" class="btn btn-primary">Login with Scatter</button></div>
         </section>
 
+        <hr>
+
+        <section id="system-stats">
+            <div id="system-stat-container">
+                <div class="stat-card">
+                    <div class="card-body">
+                        <h4 id="frax-supply" class="card-title text-center">--</h4>
+                        <p class="card-text text-center">Circulating Supply</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="card-body">
+                        <h4 id="tether-reserve" class="card-title text-center">--</h4>
+                        <p class="card-text text-center">Reserve</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="card-body">
+                        <h4 id="collateral-ratio" class="card-title text-center">--</h4>
+                        <p class="card-text text-center">Collateral Ratio</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <section id="deposit-tokens">
             <div id="tx-error-alert" class="alert alert-danger">Error sending transaction.</div>
             <div id="sending-tx-alert" class="alert alert-info">Sending Transaction <img src="http://www.bba-reman.com/images/fbloader.gif"></div>
@@ -48,11 +73,12 @@
                 <tr>
                     <td>FRAX</td>
                     <td id="frax-balance">0.0000</td>
-                    <td id="frax-contract">0.0000</td>
+                    <td id="frax-contract"></td>
                     <td><input id="frax-amount" type="number"><button id="mint-frax">Mint</button></td>
                 </tr>
             </table>
         </section>
+
     </div>
 
     <footer></footer>

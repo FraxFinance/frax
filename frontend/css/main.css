@@ -1,4 +1,4 @@
-#login, #deposit-tokens {
+#login, #deposit-tokens, #system-stats {
     padding: 0 5%;
 }
 #no-scatter-alert, #welcome-user-alert, #tx-error-alert, #login-scatter, #sending-tx-alert {
@@ -7,3 +7,8 @@
 #login-scatter {
     margin-bottom: 10px;
 }
+#system-stat-container {
+    display: flex;
+    justify-content: center;
+}
+.card

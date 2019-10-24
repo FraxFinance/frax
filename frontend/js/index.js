@@ -17,6 +17,63 @@ let eos;
 let account;
 const scatter = ScatterJS.scatter;
 
+function updateStats () {
+    const req1 = fetch("https://mainnet.libertyblock.io:7777/v1/chain/get_table_rows", {
+        method: "POST",
+        body: JSON.stringify({
+            code: "fraxfitokens",
+            scope: "FRAX",
+            table: "stat",
+            json: true
+        })
+    })
+    .then(response => response.json())
+    .then(json => {
+        let supply;
+        json.rows.forEach(function (row) {
+            if (row.supply.includes("FRAX")) {
+                supply = Number(row.supply.split(' ')[0]);
+                document.getElementById('frax-supply').textContent = supply.toFixed(0) + " FRAX";
+            }
+        });
+        return supply;
+    })
+    .catch(console.error);
+
+    const req2 = fetch("https://mainnet.libertyblock.io:7777/v1/chain/get_table_rows", {
+        method: "POST",
+        body: JSON.stringify({
+            code: "fraxreserves",
+            scope: "fraxreserves",
+            table: "stats",
+            json: true
+        })
+    })
+    .then(response => response.json())
+    .then(json => {
+        let reserve;
+        json.rows.forEach(function (row) {
+            if (row.supply.includes("USDT")) {
+                reserve = Number(row.supply.split(' ')[0]);
+                document.getElementById('tether-reserve').textContent = reserve.toFixed(0) + " USDT";
+            }
+        });
+        return reserve;
+    })
+    .catch(console.error);
+
+    const joint = Promise.all([req1, req2]);
+    joint.then((values) => {
+        const supply = values[0];
+        const reserve = values[1];
+        const percent = reserve / supply * 100;
+        document.getElementById('collateral-ratio').textContent = percent.toFixed(1) + '%';
+    });
+
+    return joint;
+}
+updateStats();
+
 function updateBalances () {
     // Get Contract Deposit Data
     const req1 = fetch("https://mainnet.libertyblock.io:7777/v1/chain/get_table_rows", {
