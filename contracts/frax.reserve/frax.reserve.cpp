@@ -117,6 +117,31 @@ void fraxreserve::buyfrax(name buyer, asset frax) {
 }
 
 [[eosio::action]]
+void fraxreserve::sellfrax(name seller, asset frax) {
+    require_auth(buyer);
+
+    check(frax.amount > 0, "Must sell a positive amount");
+    check(frax.symbol == FRAX_SYMBOL, "Can only sell FRAX");
+
+    sysparams paramstbl( _self, _self.value);
+    check(paramstbl.begin() != paramstbl.end(), "Reserve params must be initialized first");
+    auto param_it = paramstbl.begin();
+
+    stats statstable(_self, _self.value);
+    auto fxs_stats = statstable.find(FXS_SYMBOL.raw());
+    auto usdt_stats = statstable.find(USDT_SYMBOL.raw());
+    check(fxs_stats != statstable.end(), "Must addtoken FXS first");
+    check(usdt_stats != statstable.end(), "Must addtoken USDT first");
+
+    uint64_t total_assets = param_it->target_usdt + param_it->target_fxs * param_it->fxs_price;
+    double reserve_ratio = double(param_it->target_usdt) / double(total_assets);
+    asset buy_usdt = asset(int64_t(frax.amount * reserve_ratio), USDT_SYMBOL);
+    asset buy_fxs = asset(total_assets - buy_usdt.amount, FXS_SYMBOL);
+    check(buy_usdt <= usdt_stats->available, "Attempting to sell too much FRAX");
+    check(buy_fxs <= fxs_stats->available, "Attempting to sell too much FRAX");
+}
+
+[[eosio::action]]
 void fraxreserve::settarget(asset target_usdt, asset target_fxs, uint64_t fxs_price) {
     require_auth( _self );
 

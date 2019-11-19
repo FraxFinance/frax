@@ -24,6 +24,9 @@ public:
 
     [[eosio::action]]
     void settarget(asset reserve_usdt, asset reserve_fxs, uint64_t fxs_price);
+
+    [[eosio::action]]
+    void sellfrax(name seller, asset frax);
     
     // Public but not a directly callable action
     // Called indirectly by sending EOS to this contract
