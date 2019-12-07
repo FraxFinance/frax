@@ -178,11 +178,11 @@ cleos push action everipediaiq transfer '["everipediaiq", "dcbtestusere", "10000
 echo -e "${CYAN}-----------------------TRANSFERRING TETHER-----------------------${NC}"
 cleos push action tethertether create '[ "tethertether", "10000000000.0000 USDT" ]' -p tethertether
 cleos push action tethertether issue '[ "tethertether", "1000000000.0000 USDT", "issue USDT" ]' -p tethertether
-cleos push action tethertether transfer '["tethertether", "dcbtestusera", "10000.0000 USDT", "memo"]' -p tethertether
-cleos push action tethertether transfer '["tethertether", "dcbtestuserb", "10000.0000 USDT", "memo"]' -p tethertether
-cleos push action tethertether transfer '["tethertether", "dcbtestuserc", "10000.0000 USDT", "memo"]' -p tethertether
-cleos push action tethertether transfer '["tethertether", "dcbtestuserd", "10000.0000 USDT", "memo"]' -p tethertether
-cleos push action tethertether transfer '["tethertether", "dcbtestusere", "10000.0000 USDT", "memo"]' -p tethertether
+cleos push action tethertether transfer '["tethertether", "dcbtestusera", "100000.0000 USDT", "memo"]' -p tethertether
+cleos push action tethertether transfer '["tethertether", "dcbtestuserb", "100000.0000 USDT", "memo"]' -p tethertether
+cleos push action tethertether transfer '["tethertether", "dcbtestuserc", "100000.0000 USDT", "memo"]' -p tethertether
+cleos push action tethertether transfer '["tethertether", "dcbtestuserd", "100000.0000 USDT", "memo"]' -p tethertether
+cleos push action tethertether transfer '["tethertether", "dcbtestusere", "100000.0000 USDT", "memo"]' -p tethertether
 
 echo -e "${CYAN}-----------------------TRANSFERRING FRAX-----------------------${NC}"
 cleos push action fraxfitokens create '[ "fraxreserves", "10000000000.0000 FRAX" ]' -p fraxfitokens

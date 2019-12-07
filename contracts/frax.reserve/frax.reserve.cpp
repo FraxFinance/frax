@@ -79,8 +79,8 @@ void fraxreserve::buyfrax(name buyer, asset frax) {
 
     asset sell_usdt = asset(frax.amount * needed_usdt.amount / total_needed_value, USDT_SYMBOL);
     asset sell_fxs = asset(frax.amount * needed_fxs_value / total_needed_value, FXS_SYMBOL);
-    check(sell_usdt <= needed_usdt, "Attempting to buy too much FRAX");
-    check(sell_fxs <= needed_fxs, "Attempting to buy too much FRAX");
+    check(sell_usdt <= needed_usdt, "Purchase sends USDT over target");
+    check(sell_fxs <= needed_fxs, "Purchase sends FXS over target");
 
     // Update accounts and stats
     accounts deptbl( _self, buyer.value );
@@ -118,7 +118,7 @@ void fraxreserve::buyfrax(name buyer, asset frax) {
 
 [[eosio::action]]
 void fraxreserve::sellfrax(name seller, asset frax) {
-    require_auth(buyer);
+    require_auth(seller);
 
     check(frax.amount > 0, "Must sell a positive amount");
     check(frax.symbol == FRAX_SYMBOL, "Can only sell FRAX");
@@ -130,15 +130,62 @@ void fraxreserve::sellfrax(name seller, asset frax) {
     stats statstable(_self, _self.value);
     auto fxs_stats = statstable.find(FXS_SYMBOL.raw());
     auto usdt_stats = statstable.find(USDT_SYMBOL.raw());
+    auto frax_stats = statstable.find(FRAX_SYMBOL.raw());
     check(fxs_stats != statstable.end(), "Must addtoken FXS first");
     check(usdt_stats != statstable.end(), "Must addtoken USDT first");
+    check(usdt_stats != statstable.end(), "Must addtoken FRAX first");
 
-    uint64_t total_assets = param_it->target_usdt + param_it->target_fxs * param_it->fxs_price;
-    double reserve_ratio = double(param_it->target_usdt) / double(total_assets);
-    asset buy_usdt = asset(int64_t(frax.amount * reserve_ratio), USDT_SYMBOL);
-    asset buy_fxs = asset(total_assets - buy_usdt.amount, FXS_SYMBOL);
-    check(buy_usdt <= usdt_stats->available, "Attempting to sell too much FRAX");
-    check(buy_fxs <= fxs_stats->available, "Attempting to sell too much FRAX");
+    asset buy_usdt = asset(frax.amount, USDT_SYMBOL);
+    asset buy_fxs = asset(0, FXS_SYMBOL); // No FXS redepmtions permitted for now
+    check(buy_usdt <= usdt_stats->supply, "Not enough USDT in contract to cover sale");
+    check(buy_fxs <= fxs_stats->supply, "Not enough FXS in contract to cover sale");
+
+    // Update balances
+    accounts deptbl( _self, seller.value );
+    auto frax_account = deptbl.find(FRAX_SYMBOL.raw());
+    check(frax_account->balance >= frax, "Not enough FRAX deposited for sale");
+    deptbl.modify( frax_account, same_payer, [&](auto& a) {
+        a.balance -= frax;
+    });
+    if (buy_usdt.amount > 0) {
+        auto usdt_account = deptbl.find(USDT_SYMBOL.raw());
+        if (usdt_account == deptbl.end()) {
+            deptbl.emplace( _self, [&](auto& a) {
+                a.balance = buy_usdt;
+            });
+        }
+        else {
+            deptbl.modify( usdt_account, same_payer, [&](auto& a) {
+                a.balance += buy_usdt;
+            });
+        }
+        statstable.modify( usdt_stats, same_payer, [&](auto& usdt) {
+            usdt.supply -= buy_usdt;
+        });
+    }
+    if (buy_fxs.amount > 0) {
+        auto fxs_account = deptbl.find(USDT_SYMBOL.raw());
+        if (fxs_account == deptbl.end()) {
+            deptbl.emplace( _self, [&](auto& a) {
+                a.balance = buy_fxs;
+            });
+        }
+        else {
+            deptbl.modify( fxs_account, same_payer, [&](auto& a) {
+                a.balance += buy_fxs;
+            });
+        }
+        statstable.modify( fxs_stats, same_payer, [&](auto& fxs) {
+            fxs.supply -= buy_fxs;
+        });
+    }
+    
+    // Retire FRAX
+    action(
+        permission_level { _self, name("active") },
+        FRAX_TOKENS, name("retire"),
+        std::make_tuple( frax, std::string("retire FRAX") )
+    ).send();
 }
 
 [[eosio::action]]
@@ -148,6 +195,12 @@ void fraxreserve::settarget(asset target_usdt, asset target_fxs, uint64_t fxs_pr
     check(target_usdt.symbol == USDT_SYMBOL, "Symbol mismatch for target_usdt");
     check(target_fxs.symbol == FXS_SYMBOL, "Symbol mismatch for target_usdt");
     check(fxs_price > 0, "fxs_price must be postive");
+
+    stats statstable(_self, _self.value);
+    auto& fxs_stats = statstable.get(FXS_SYMBOL.raw());
+    auto& usdt_stats = statstable.get(USDT_SYMBOL.raw());
+    check(fxs_stats.supply <= target_fxs, "Cannot set target below current FXS supply");
+    check(usdt_stats.supply <= target_usdt, "Cannot set target below current USDT supply");
 
     sysparams paramstbl( _self, _self.value);
     if (paramstbl.begin() == paramstbl.end()) {
@@ -178,7 +231,7 @@ extern "C" void apply(uint64_t receiver, uint64_t code, uint64_t action)
     else if (code == _self)
     {
         switch (action) {
-            EOSIO_DISPATCH_HELPER( fraxreserve, (addtoken)(buyfrax)(settarget) )
+            EOSIO_DISPATCH_HELPER( fraxreserve, (addtoken)(buyfrax)(settarget)(sellfrax) )
         }
     }
 }
