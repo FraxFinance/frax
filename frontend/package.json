@@ -13,8 +13,8 @@
   "license": "ISC",
   "devDependencies": {
     "@babel/runtime": "^7.6.3",
-    "webpack": "^4.41.1",
-    "webpack-cli": "^3.3.9"
+    "webpack": "^5.75.0",
+    "webpack-cli": "^5.0.1"
   },
   "dependencies": {
     "@scatterjs/core": "^2.7.46",
